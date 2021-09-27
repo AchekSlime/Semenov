@@ -38,9 +38,9 @@ public class SemenovApplication {
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    public void test() {
-        User creator = createUser("Creator");
-        User user = createUser("User");
+    public void generateUsers() {
+        User creator = createUser("maksemenov@gmail.com");
+        User user = createUser("achekslime@yandex.ru");
 
         Project project1 = createProject("Project-1", creator);
 
@@ -85,6 +85,7 @@ public class SemenovApplication {
     private Project createProject(String name, User holder){
         Project newProject = new Project(name, "Description", 0, holder, null, null);
         projectService.save(newProject);
+        userProjectService.save(holder, newProject);
         return newProject;
     }
 

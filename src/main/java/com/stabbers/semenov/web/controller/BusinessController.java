@@ -10,7 +10,6 @@ import com.stabbers.semenov.web.json.*;
 import com.stabbers.semenov.model.Project;
 import com.stabbers.semenov.model.Task;
 import com.stabbers.semenov.web.security.JwtProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -73,12 +72,15 @@ public class BusinessController {
         String token = Utils.getTokenFromHeader(bearer);
 
         User user = null;
-        if (token != null && jwtProvider.validateToken(token)) {
-            String userLogin = jwtProvider.getLoginFromToken(token);
-            user = userService.findByLogin(userLogin);
+        if (token == null && !jwtProvider.validateToken(token)) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
+        String userLogin = jwtProvider.getLoginFromToken(token);
+        user = userService.findByLogin(userLogin);
+
         if (user == null)
-            return null;
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
         List<Task> tasks = taskService.getByProjectId(request.getProjectId());
         return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
@@ -105,12 +107,14 @@ public class BusinessController {
         String token = Utils.getTokenFromHeader(bearer);
 
         User user = null;
-        if (token != null && jwtProvider.validateToken(token)) {
-            String userLogin = jwtProvider.getLoginFromToken(token);
-            user = userService.findByLogin(userLogin);
+        if (token == null && !jwtProvider.validateToken(token)) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
+        String userLogin = jwtProvider.getLoginFromToken(token);
+        user = userService.findByLogin(userLogin);
+
         if (user == null)
-            return null;
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         return new ResponseEntity<>(taskService.findById(request.getTaskId()), HttpStatus.OK);
     }
